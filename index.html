@@ -18,10 +18,11 @@
         .container {
             text-align: center;
             background: white;
-            padding: 20px;
+            padding: 30px 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             width: 400px;
+            position: relative;
         }
 
         h1 {
@@ -29,7 +30,7 @@
             color: white;
             padding: 10px;
             border-radius: 10px 10px 0 0;
-            margin: 0;
+            margin: -30px -20px 20px -20px;
             font-size: 24px;
         }
 
@@ -116,6 +117,24 @@
             background-color: #e0a907;
         }
 
+        #start-game {
+            display: block;
+            margin-top: 20px;
+            background-color: #8cbf88;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        #start-game:hover {
+            background-color: #7aa87a;
+        }
+
         #wrong-words {
             display: none;
             margin-top: 20px;
@@ -133,12 +152,45 @@
             margin: 5px 0;
             border-radius: 5px;
         }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+            padding: 0 20px;
+            text-align: left;
+        }
+
+        .slider-container label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .slider-container input {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>de of het</h1>
-        <div id="game">
+        <div id="start-screen">
+            <div class="slider-container">
+                <label for="word-count">Select the amount of words: <span id="word-count-label">10</span></label>
+                <input type="range" id="word-count" name="word-count" min="10" max="50" value="10" oninput="updateWordCountLabel(this.value)">
+            </div>
+            <button id="start-game" onclick="startGame()">Start Game</button>
+        </div>
+        <div id="game" style="display: none;">
             <p id="word">brug</p>
             <div class="buttons">
                 <button id="deButton" onclick="checkAnswer('de')">de</button>
@@ -160,162 +212,35 @@
             </div>
             <p id="message"></p>
         </div>
-        <button id="restart" onclick="startGame()">Try Again</button>
+        <button id="restart" onclick="showStartScreen()">Try Again</button>
         <div id="wrong-words">
             <h3>Words you got wrong:</h3>
             <ul id="wrong-list"></ul>
         </div>
+        <div class="progress-bar" id="progress-bar"></div>
     </div>
     <script>
         let words = [
-    { "word": "man", "article": "de", "translation": "man" },
-    { "word": "vrouw", "article": "de", "translation": "woman" },
-    { "word": "kind", "article": "het", "translation": "child" },
-    { "word": "huis", "article": "het", "translation": "house" },
-    { "word": "auto", "article": "de", "translation": "car" },
-    { "word": "fiets", "article": "de", "translation": "bicycle" },
-    { "word": "boek", "article": "het", "translation": "book" },
-    { "word": "tafel", "article": "de", "translation": "table" },
-    { "word": "stoel", "article": "de", "translation": "chair" },
-    { "word": "deur", "article": "de", "translation": "door" },
-    { "word": "raam", "article": "het", "translation": "window" },
-    { "word": "kat", "article": "de", "translation": "cat" },
-    { "word": "hond", "article": "de", "translation": "dog" },
-    { "word": "straat", "article": "de", "translation": "street" },
-    { "word": "boom", "article": "de", "translation": "tree" },
-    { "word": "bloem", "article": "de", "translation": "flower" },
-    { "word": "school", "article": "de", "translation": "school" },
-    { "word": "kerk", "article": "de", "translation": "church" },
-    { "word": "winkel", "article": "de", "translation": "shop" },
-    { "word": "stad", "article": "de", "translation": "city" },
-    { "word": "dorp", "article": "het", "translation": "village" },
-    { "word": "zee", "article": "de", "translation": "sea" },
-    { "word": "rivier", "article": "de", "translation": "river" },
-    { "word": "berg", "article": "de", "translation": "mountain" },
-    { "word": "bos", "article": "het", "translation": "forest" },
-    { "word": "meisje", "article": "het", "translation": "girl" },
-    { "word": "jongen", "article": "de", "translation": "boy" },
-    { "word": "vader", "article": "de", "translation": "father" },
-    { "word": "moeder", "article": "de", "translation": "mother" },
-    { "word": "broer", "article": "de", "translation": "brother" },
-    { "word": "zus", "article": "de", "translation": "sister" },
-    { "word": "oma", "article": "de", "translation": "grandmother" },
-    { "word": "opa", "article": "de", "translation": "grandfather" },
-    { "word": "vriend", "article": "de", "translation": "friend" },
-    { "word": "vriendin", "article": "de", "translation": "girlfriend" },
-    { "word": "dokter", "article": "de", "translation": "doctor" },
-    { "word": "leraar", "article": "de", "translation": "teacher" },
-    { "word": "student", "article": "de", "translation": "student" },
-    { "word": "universiteit", "article": "de", "translation": "university" },
-    { "word": "klas", "article": "de", "translation": "class" },
-    { "word": "computer", "article": "de", "translation": "computer" },
-    { "word": "telefoon", "article": "de", "translation": "phone" },
-    { "word": "televisie", "article": "de", "translation": "television" },
-    { "word": "radio", "article": "de", "translation": "radio" },
-    { "word": "film", "article": "de", "translation": "movie" },
-    { "word": "muziek", "article": "de", "translation": "music" },
-    { "word": "lied", "article": "het", "translation": "song" },
-    { "word": "feest", "article": "het", "translation": "party" },
-    { "word": "spel", "article": "het", "translation": "game" },
-    { "word": "sport", "article": "de", "translation": "sport" },
-    { "word": "voetbal", "article": "de", "translation": "football" },
-    { "word": "basketbal", "article": "de", "translation": "basketball" },
-    { "word": "tennis", "article": "het", "translation": "tennis" },
-    { "word": "hockey", "article": "de", "translation": "hockey" },
-    { "word": "schoolplein", "article": "het", "translation": "schoolyard" },
-    { "word": "kantoor", "article": "het", "translation": "office" },
-    { "word": "baan", "article": "de", "translation": "job" },
-    { "word": "beroep", "article": "het", "translation": "profession" },
-    { "word": "geld", "article": "het", "translation": "money" },
-    { "word": "bank", "article": "de", "translation": "bank" },
-    { "word": "winkelcentrum", "article": "het", "translation": "shopping center" },
-    { "word": "markt", "article": "de", "translation": "market" },
-    { "word": "supermarkt", "article": "de", "translation": "supermarket" },
-    { "word": "brood", "article": "het", "translation": "bread" },
-    { "word": "melk", "article": "de", "translation": "milk" },
-    { "word": "kaas", "article": "de", "translation": "cheese" },
-    { "word": "boter", "article": "de", "translation": "butter" },
-    { "word": "fruit", "article": "het", "translation": "fruit" },
-    { "word": "appel", "article": "de", "translation": "apple" },
-    { "word": "banaan", "article": "de", "translation": "banana" },
-    { "word": "sinaasappel", "article": "de", "translation": "orange" },
-    { "word": "druif", "article": "de", "translation": "grape" },
-    { "word": "peer", "article": "de", "translation": "pear" },
-    { "word": "aardbei", "article": "de", "translation": "strawberry" },
-    { "word": "groente", "article": "de", "translation": "vegetable" },
-    { "word": "tomaat", "article": "de", "translation": "tomato" },
-    { "word": "komkommer", "article": "de", "translation": "cucumber" },
-    { "word": "wortel", "article": "de", "translation": "carrot" },
-    { "word": "aardappel", "article": "de", "translation": "potato" },
-    { "word": "ui", "article": "de", "translation": "onion" },
-    { "word": "knoflook", "article": "de", "translation": "garlic" },
-    { "word": "peper", "article": "de", "translation": "pepper" },
-    { "word": "zout", "article": "het", "translation": "salt" },
-    { "word": "olie", "article": "de", "translation": "oil" },
-    { "word": "water", "article": "het", "translation": "water" },
-    { "word": "thee", "article": "de", "translation": "tea" },
-    { "word": "koffie", "article": "de", "translation": "coffee" },
-    { "word": "bier", "article": "het", "translation": "beer" },
-    { "word": "wijn", "article": "de", "translation": "wine" },
-    { "word": "sap", "article": "het", "translation": "juice" },
-    { "word": "drankje", "article": "het", "translation": "drink" },
-    { "word": "soep", "article": "de", "translation": "soup" },
-    { "word": "vlees", "article": "het", "translation": "meat" },
-    { "word": "kip", "article": "de", "translation": "chicken" },
-    { "word": "vis", "article": "de", "translation": "fish" },
-    { "word": "ei", "article": "het", "translation": "egg" },
-    { "word": "ontbijt", "article": "het", "translation": "breakfast" },
-    { "word": "lunch", "article": "de", "translation": "lunch" },
-    { "word": "diner", "article": "het", "translation": "dinner" },
-    { "word": "maaltijd", "article": "de", "translation": "meal" },
-    { "word": "restaurant", "article": "het", "translation": "restaurant" },
-    { "word": "keuken", "article": "de", "translation": "kitchen" },
-    { "word": "slaapkamer", "article": "de", "translation": "bedroom" },
-    { "word": "badkamer", "article": "de", "translation": "bathroom" },
-    { "word": "woonkamer", "article": "de", "translation": "living room" },
-    { "word": "zolder", "article": "de", "translation": "attic" },
-    { "word": "kelder", "article": "de", "translation": "basement" },
-    { "word": "garage", "article": "de", "translation": "garage" },
-    { "word": "tuin", "article": "de", "translation": "garden" },
-    { "word": "gras", "article": "het", "translation": "grass" },
-    { "word": "bloem", "article": "de", "translation": "flower" },
-    { "word": "boom", "article": "de", "translation": "tree" },
-    { "word": "blad", "article": "het", "translation": "leaf" },
-    { "word": "tak", "article": "de", "translation": "branch" },
-    { "word": "bos", "article": "het", "translation": "forest" },
-    { "word": "veld", "article": "het", "translation": "field" },
-    { "word": "weide", "article": "de", "translation": "meadow" },
-    { "word": "plant", "article": "de", "translation": "plant" },
-    { "word": "dier", "article": "het", "translation": "animal" },
-    { "word": "kat", "article": "de", "translation": "cat" },
-    { "word": "hond", "article": "de", "translation": "dog" },
-    { "word": "vogel", "article": "de", "translation": "bird" },
-    { "word": "vis", "article": "de", "translation": "fish" },
-    { "word": "paard", "article": "het", "translation": "horse" },
-    { "word": "koe", "article": "de", "translation": "cow" },
-    { "word": "varken", "article": "het", "translation": "pig" },
-    { "word": "schaap", "article": "het", "translation": "sheep" },
-    { "word": "geit", "article": "de", "translation": "goat" },
-    { "word": "kip", "article": "de", "translation": "chicken" },
-    { "word": "eend", "article": "de", "translation": "duck" },
-    { "word": "gans", "article": "de", "translation": "goose" },
-    { "word": "konijn", "article": "het", "translation": "rabbit" },
-    { "word": "muur", "article": "de", "translation": "wall" },
-    { "word": "plafond", "article": "het", "translation": "ceiling" },
-    { "word": "vloer", "article": "de", "translation": "floor" },
-    { "word": "tapijt", "article": "het", "translation": "carpet" },
-    { "word": "deur", "article": "de", "translation": "door" },
-    { "word": "raam", "article": "het", "translation": "window" },
-    { "word": "gordijn", "article": "het", "translation": "curtain" },
-    { "word": "lamp", "article": "de", "translation": "lamp" },
-    { "word": "stoel", "article": "de", "translation": "chair" },
-    { "word": "tafel", "article": "de", "translation": "table" },
-    { "word": "kast", "article": "de", "translation": "cupboard" },
-    { "word": "bed", "article": "het", "translation": "bed" },
-    { "word": "kussen", "article": "het", "translation": "pillow" },
-    { "word": "deken", "article": "de", "translation": "blanket" },
-    { "word": "laken", "article": "het", "translation": "sheet" },
-    { "word": "matras", "article": "het", "translation": "mattress" }
+            { word: "man", article: "de", translation: "man" },
+            { word: "vrouw", article: "de", translation: "woman" },
+            { word: "kind", article: "het", translation: "child" },
+            { word: "huis", article: "het", translation: "house" },
+            { word: "auto", article: "de", translation: "car" },
+            { word: "fiets", article: "de", translation: "bicycle" },
+            { word: "boek", article: "het", translation: "book" },
+            { word: "tafel", article: "de", translation: "table" },
+            { word: "stoel", article: "de", translation: "chair" },
+            { word: "deur", article: "de", translation: "door" },
+            { word: "raam", article: "het", translation: "window" },
+            { word: "kat", article: "de", translation: "cat" },
+            { word: "hond", article: "de", translation: "dog" },
+            { word: "straat", article: "de", translation: "street" },
+            { word: "boom", article: "de", translation: "tree" },
+            { word: "bloem", article: "de", translation: "flower" },
+            { word: "school", article: "de", translation: "school" },
+            { word: "kerk", article: "de", translation: "church" },
+            { word: "winkel", article: "de", translation: "shop" },
+            { word: "stad", article: "de", translation: "city" }
         ];
 
         let lives = 3;
@@ -323,13 +248,19 @@
         let currentWordIndex = 0;
         let selectedWords = [];
         let wrongWords = [];
+        let numberOfWords = 10;
+
+        function updateWordCountLabel(value) {
+            document.getElementById('word-count-label').textContent = value;
+        }
 
         function startGame() {
             lives = 3;
             score = 0;
             currentWordIndex = 0;
             wrongWords = [];
-            selectedWords = getRandomWords(20, words);
+            numberOfWords = document.getElementById('word-count').value;
+            selectedWords = getRandomWords(numberOfWords, words);
             document.body.style.backgroundColor = '#f0f0f0';
             document.getElementById("lives").textContent = `🧡🧡🧡`;
             document.getElementById("score").textContent = score;
@@ -338,8 +269,20 @@
             document.getElementById("restart").style.display = 'none';
             document.getElementById("wrong-words").style.display = 'none';
             document.getElementById("wrong-list").innerHTML = '';
+            document.getElementById("progress-bar").style.width = '0%';
+            document.getElementById("progress-bar").style.display = 'block';
             enableButtons();
+            document.getElementById("start-screen").style.display = 'none';
+            document.getElementById("game").style.display = 'block';
             showWord();
+        }
+
+        function showStartScreen() {
+            document.getElementById("game").style.display = 'none';
+            document.getElementById("restart").style.display = 'none';
+            document.getElementById("wrong-words").style.display = 'none';
+            document.getElementById("start-screen").style.display = 'block';
+            document.getElementById("progress-bar").style.display = 'none';
         }
 
         function getRandomWords(n, wordsArray) {
@@ -351,9 +294,11 @@
             if (currentWordIndex < selectedWords.length) {
                 document.getElementById("word").textContent = selectedWords[currentWordIndex].word;
                 document.getElementById("translation").textContent = selectedWords[currentWordIndex].translation;
+                updateProgressBar();
             } else {
                 document.getElementById("message").textContent = 'Congratulations! You completed the quiz.';
                 document.getElementById("restart").style.display = 'block';
+                disableButtons();
             }
         }
 
@@ -404,8 +349,14 @@
             document.getElementById("hetButton").disabled = false;
         }
 
+        function updateProgressBar() {
+            const progress = ((currentWordIndex + 1) / numberOfWords) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
         document.addEventListener('DOMContentLoaded', (event) => {
-            startGame();
+            document.getElementById("start-screen").style.display = 'block';
+            document.getElementById("start-game").style.display = 'block';
         });
     </script>
 </body>
