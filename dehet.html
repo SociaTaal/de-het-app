@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De of Het app</title>
+    <style>
+        .de-of-het-app {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .de-of-het-container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .de-of-het-container h1 {
+            background-color: #fbbd08;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .de-of-het-container #word {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .de-of-het-container .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .de-of-het-container button {
+            background-color: #8cbf88;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .de-of-het-container button:hover {
+            background-color: #7aa87a;
+        }
+
+        .de-of-het-container .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ffe7c2;
+            border-radius: 10px;
+        }
+
+        .de-of-het-container .info-box {
+            text-align: center;
+            flex: 1;
+        }
+
+        .de-of-het-container .info-box:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .de-of-het-container .info-title {
+            font-weight: bold;
+        }
+
+        .de-of-het-container .hearts {
+            display: flex;
+            justify-content: center;
+        }
+
+        .de-of-het-container #message {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .de-of-het-container #restart {
+            display: none;
+            margin-top: 20px;
+            background-color: #fbbd08;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .de-of-het-container #restart:hover {
+            background-color: #e0a907;
+        }
+
+        .de-of-het-container #wrong-words {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .de-of-het-container #wrong-words ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .de-of-het-container #wrong-words li {
+            background-color: #f8d7da;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="de-of-het-app">
+    <div class="de-of-het-container">
+        <h1>de of het</h1>
+        <div id="game">
+            <p id="word">brug</p>
+            <div class="buttons">
+                <button onclick="checkAnswer('de')">de</button>
+                <button onclick="checkAnswer('het')">het</button>
+            </div>
+            <div class="info-row">
+                <div class="info-box">
+                    <div class="info-title">Translation</div>
+                    <div id="translation">bridge</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-title">Score</div>
+                    <div id="score">0</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-title">Lives</div>
+                    <div id="lives" class="hearts">🧡🧡🧡</div>
+                </div>
+            </div>
+            <p id="message"></p>
+        </div>
+        <button id="restart" onclick="startGame()">Try Again</button>
+        <div id="wrong-words">
+            <h3>Words you got wrong:</h3>
+            <ul id="wrong-list"></ul>
+        </div>
+    </div>
+    <script>
+        (function() {
+            let words = [
+                { word: "man", article: "de", translation: "man" },
+                { word: "vrouw", article: "de", translation: "woman" },
+                { word: "kind", article: "het", translation: "child" },
+                { word: "huis", article: "het", translation: "house" },
+                { word: "auto", article: "de", translation: "car" },
+                { word: "fiets", article: "de", translation: "bicycle" },
+                { word: "boek", article: "het", translation: "book" },
+                { word: "tafel", article: "de", translation: "table" },
+                { word: "stoel", article: "de", translation: "chair" },
+                { word: "deur", article: "de", translation: "door" },
+                { word: "raam", article: "het", translation: "window" },
+                { word: "kat", article: "de", translation: "cat" },
+                { word: "hond", article: "de", translation: "dog" },
+                { word: "straat", article: "de", translation: "street" },
+                { word: "boom", article: "de", translation: "tree" },
+                { word: "bloem", article: "de", translation: "flower" },
+                { word: "school", article: "de", translation: "school" },
+                { word: "kerk", article: "de", translation: "church" },
+                { word: "winkel", article: "de", translation: "shop" },
+                { word: "stad", article: "de", translation: "city" }
+            ];
+
+            let lives = 3;
+            let score = 0;
+            let currentWordIndex = 0;
+            let selectedWords = [];
+            let wrongWords = [];
+
+            window.startGame = function() {
+                lives = 3;
+                score = 0;
+                currentWordIndex = 0;
+                wrongWords = [];
+                selectedWords = getRandomWords(20, words);
+                document.body.style.backgroundColor = '#f0f0f0';
+                document.getElementById("lives").textContent = `🧡🧡🧡`;
+                document.getElementById("score").textContent = score;
+                document.getElementById("translation").textContent = '';
+                document.getElementById("message").textContent = '';
+                document.getElementById("restart").style.display = 'none';
+                document.getElementById("wrong-words").style.display = 'none';
+                document.getElementById("wrong-list").innerHTML = '';
+                showWord();
+            }
+
+            function getRandomWords(n, wordsArray) {
+                let shuffled = wordsArray.sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, n);
+            }
+
+            function showWord() {
+                if (currentWordIndex < selectedWords.length) {
+                    document.getElementById("word").textContent = selectedWords[currentWordIndex].word;
+                    document.getElementById("translation").textContent = selectedWords[currentWordIndex].translation;
+                } else {
+                    document.getElementById("message").textContent = 'Congratulations! You completed the quiz.';
+                    document.getElementById("restart").style.display = 'block';
+                }
+            }
+
+            window.checkAnswer = function(article) {
+                if (currentWordIndex < selectedWords.length) {
+                    if (selectedWords[currentWordIndex].article === article) {
+                        document.getElementById("message").textContent = 'Correct!';
+                        document.body.style.backgroundColor = '#d4edda'; // Light green
+                        score++;
+                        document.getElementById("score").textContent = score;
+                    } else {
+                        wrongWords.push(selectedWords[currentWordIndex]);
+                        lives--;
+                        document.getElementById("lives").textContent = `🧡`.repeat(lives);
+                        document.getElementById("message").textContent = 'Wrong!';
+                        document.body.style.backgroundColor = '#f8d7da'; // Light red
+                        if (lives === 0) {
+                            document.getElementById("message").textContent = 'Game Over! Try Again.';
+                            document.getElementById("restart").style.display = 'block';
+                            showWrongWords();
+                            return;
+                        }
+                    }
+                    currentWordIndex++;
+                    setTimeout(showWord, 500); // Add delay before showing next word
+                }
+            }
+
+            function showWrongWords() {
+                const wrongList = document.getElementById("wrong-list");
+                wrongList.innerHTML = '';
+                wrongWords.forEach(word => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${word.word} (${word.translation}) - Correct article: ${word.article}`;
+                    wrongList.appendChild(listItem);
+                });
+                document.getElementById("wrong-words").style.display = 'block';
+            }
+
+            document.addEventListener('DOMContentLoaded', (event) => {
+                startGame();
+            });
+        })();
+    </script>
+</body>
+</html>
