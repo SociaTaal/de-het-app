@@ -60,6 +60,11 @@
             background-color: #7aa87a;
         }
 
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -136,8 +141,8 @@
         <div id="game">
             <p id="word">brug</p>
             <div class="buttons">
-                <button onclick="checkAnswer('de')">de</button>
-                <button onclick="checkAnswer('het')">het</button>
+                <button id="deButton" onclick="checkAnswer('de')">de</button>
+                <button id="hetButton" onclick="checkAnswer('het')">het</button>
             </div>
             <div class="info-row">
                 <div class="info-box">
@@ -205,6 +210,7 @@
             document.getElementById("restart").style.display = 'none';
             document.getElementById("wrong-words").style.display = 'none';
             document.getElementById("wrong-list").innerHTML = '';
+            enableButtons();
             showWord();
         }
 
@@ -240,6 +246,7 @@
                         document.getElementById("message").textContent = 'Game Over! Try Again.';
                         document.getElementById("restart").style.display = 'block';
                         showWrongWords();
+                        disableButtons();
                         return;
                     }
                 }
@@ -257,6 +264,16 @@
                 wrongList.appendChild(listItem);
             });
             document.getElementById("wrong-words").style.display = 'block';
+        }
+
+        function disableButtons() {
+            document.getElementById("deButton").disabled = true;
+            document.getElementById("hetButton").disabled = true;
+        }
+
+        function enableButtons() {
+            document.getElementById("deButton").disabled = false;
+            document.getElementById("hetButton").disabled = false;
         }
 
         document.addEventListener('DOMContentLoaded', (event) => {
